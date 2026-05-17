@@ -5,31 +5,285 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StreetScope</title>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
-      padding: 0;
       font-family: system-ui, sans-serif;
       background: #0f0f0f;
-      color: #fff;
+      color: #f0f0f0;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 { font-size: 2.4rem; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+    .tagline { color: #888; font-size: 1rem; margin-bottom: 2.5rem; }
+
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .drop-zone {
+      border: 2px dashed #333;
+      border-radius: 8px;
+      padding: 2.5rem 1rem;
       text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1.25rem;
     }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #555;
+      background: #222;
     }
-    p {
-      font-size: 1.2rem;
-      opacity: 0.8;
+    .drop-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .drop-zone .label { color: #aaa; font-size: 0.9rem; }
+    .drop-zone .filename { color: #f0f0f0; font-size: 0.95rem; margin-top: 0.4rem; font-weight: 500; }
+
+    #file-input { display: none; }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #f0f0f0;
+      color: #0f0f0f;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover:not(:disabled) { background: #ddd; }
+    button:disabled { background: #333; color: #666; cursor: default; }
+
+    .status {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .progress-bar-wrap {
+      background: #2a2a2a;
+      border-radius: 4px;
+      height: 6px;
+      margin: 0.75rem 0;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #f0f0f0;
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.35rem 0;
+      color: #666;
+      font-size: 0.88rem;
+    }
+    .step.active { color: #f0f0f0; }
+    .step.done { color: #5a5; }
+    .step.error { color: #c55; }
+    .step .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .result {
+      margin-top: 1.25rem;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 1rem;
+      display: none;
+    }
+    .result h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .result pre {
+      font-family: ui-monospace, monospace;
+      font-size: 0.78rem;
+      color: #aaa;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
-  <h1>StreetScope</h1>
-  <p>Camera‑driven residential intelligence. Coming soon.</p>
+
+<h1>StreetScope</h1>
+<p class="tagline">Camera-driven residential intelligence.</p>
+
+<div class="card">
+  <div class="drop-zone" id="drop-zone">
+    <div class="icon">&#127909;</div>
+    <div class="label">Drop a video here or <u>browse</u></div>
+    <div class="filename" id="filename-label"></div>
+  </div>
+  <input type="file" id="file-input" accept="video/*" />
+
+  <button id="analyze-btn" disabled>Analyze Property</button>
+
+  <div class="status" id="status" style="display:none">
+    <div class="progress-bar-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="step" id="step-presign"><span class="dot"></span> Requesting upload slot</div>
+    <div class="step" id="step-upload"><span class="dot"></span> Uploading video</div>
+    <div class="step" id="step-queue"><span class="dot"></span> Queued for analysis</div>
+    <div class="step" id="step-inference"><span class="dot"></span> Running inference</div>
+    <div class="step" id="step-done"><span class="dot"></span> Complete</div>
+  </div>
+
+  <div class="result" id="result">
+    <h3>Result</h3>
+    <pre id="result-body"></pre>
+  </div>
+</div>
+
+<script>
+  const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
+  const POLL_INTERVAL_MS = 3000;
+
+  const dropZone   = document.getElementById('drop-zone');
+  const fileInput  = document.getElementById('file-input');
+  const fileLabel  = document.getElementById('filename-label');
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const statusBox  = document.getElementById('status');
+  const progressWrap = document.getElementById('progress-wrap');
+  const progressBar  = document.getElementById('progress-bar');
+  const resultBox  = document.getElementById('result');
+  const resultBody = document.getElementById('result-body');
+
+  let selectedFile = null;
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    setFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
+
+  function setFile(f) {
+    if (!f) return;
+    selectedFile = f;
+    fileLabel.textContent = f.name;
+    analyzeBtn.disabled = false;
+  }
+
+  analyzeBtn.addEventListener('click', run);
+
+  async function run() {
+    analyzeBtn.disabled = true;
+    statusBox.style.display = 'block';
+    resultBox.style.display = 'none';
+    resetSteps();
+
+    try {
+      // 1. Presign
+      setStep('presign', 'active');
+      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(selectedFile.name)}`);
+      if (!presignRes.ok) throw new Error(`Presign failed: ${presignRes.status}`);
+      const { job_id, upload_url } = await presignRes.json();
+      setStep('presign', 'done');
+
+      // 2. Upload to S3
+      setStep('upload', 'active');
+      progressWrap.style.display = 'block';
+      await uploadWithProgress(upload_url, selectedFile);
+      progressWrap.style.display = 'none';
+      setStep('upload', 'done');
+
+      // 3. Poll
+      setStep('queue', 'active');
+      await poll(job_id);
+
+    } catch (err) {
+      markCurrentError();
+      console.error(err);
+    } finally {
+      analyzeBtn.disabled = false;
+    }
+  }
+
+  function uploadWithProgress(url, file) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', url);
+      xhr.setRequestHeader('Content-Type', 'video/mp4');
+      xhr.upload.addEventListener('progress', e => {
+        if (e.lengthComputable) progressBar.style.width = `${(e.loaded / e.total) * 100}%`;
+      });
+      xhr.addEventListener('load', () => xhr.status < 300 ? resolve() : reject(new Error(`S3 upload ${xhr.status}`)));
+      xhr.addEventListener('error', () => reject(new Error('Upload network error')));
+      xhr.send(file);
+    });
+  }
+
+  async function poll(job_id) {
+    while (true) {
+      const res = await fetch(`${API}/job/${job_id}`);
+      if (!res.ok) throw new Error(`Poll failed: ${res.status}`);
+      const job = await res.json();
+
+      if (job.status === 'processing') {
+        setStep('queue', 'done');
+        setStep('inference', 'active');
+      } else if (job.status === 'complete') {
+        setStep('queue', 'done');
+        setStep('inference', 'done');
+        setStep('done', 'done');
+        showResult(job);
+        return;
+      } else if (job.status === 'failed') {
+        throw new Error(job.error || 'Job failed');
+      }
+
+      await sleep(POLL_INTERVAL_MS);
+    }
+  }
+
+  function showResult(job) {
+    const display = job.result ?? job;
+    resultBody.textContent = JSON.stringify(display, null, 2);
+    resultBox.style.display = 'block';
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  const steps = ['presign', 'upload', 'queue', 'inference', 'done'];
+
+  function resetSteps() {
+    steps.forEach(s => setStep(s, ''));
+    progressBar.style.width = '0%';
+  }
+
+  function setStep(name, state) {
+    const el = document.getElementById(`step-${name}`);
+    el.className = `step ${state}`;
+  }
+
+  function markCurrentError() {
+    const active = document.querySelector('.step.active');
+    if (active) active.className = 'step error';
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
 </body>
 </html>
