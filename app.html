@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreetScope — Analyze</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --border: #222;
+      --text: #f0f0f0;
+      --muted: #888;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --orange: #fb923c;
+      --red: #f87171;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Gate ── */
+    #gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .gate-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 2rem;
+    }
+
+    .gate-logo {
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+    }
+
+    .gate-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .gate-card h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .gate-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .gate-card a { color: var(--text); }
+
+    #code-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      padding: 0.85rem 1rem;
+      letter-spacing: 0.08em;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #code-input:focus { border-color: #555; }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .gate-error {
+      color: var(--red);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    /* ── App shell ── */
+    #app {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 4rem;
+    }
+
+    .app-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .app-nav-logo { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+
+    .app-nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    /* ── Upload ── */
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    #upload-section h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    #upload-section p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #555;
+      background: var(--surface);
+    }
+
+    .drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+    .drop-zone h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .drop-zone p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    .drop-zone input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-selected {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .file-selected .file-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-selected .file-size { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+
+    .hint {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+    }
+
+    .hint strong { color: var(--text); }
+
+    /* ── Processing ── */
+    #processing-section {
+      text-align: center;
+      padding: 3rem 0;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #stage-label {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      min-height: 1.4em;
+    }
+
+    #elapsed-label {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    #job-id-label {
+      font-size: 0.75rem;
+      color: #444;
+      margin-top: 2rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    /* ── Result ── */
+    .score-hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .score-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .score-number {
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.25rem;
+    }
+
+    .score-sub { color: var(--muted); font-size: 0.9rem; }
+
+    .score-bar-bg {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin: 1.25rem 0 0;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.8s ease;
+    }
+
+    .components-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .components-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .component-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .component-row:last-child { border-bottom: none; }
+
+    .component-name {
+      flex: 1;
+      text-transform: capitalize;
+    }
+
+    .component-material {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .component-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .component-bar {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .component-bar-fill { height: 100%; border-radius: 2px; }
+
+    .component-score-num {
+      font-size: 0.85rem;
+      font-weight: 600;
+      width: 2.5em;
+      text-align: right;
+    }
+
+    .no-coverage {
+      font-size: 0.8rem;
+      color: #555;
+      flex-shrink: 0;
+    }
+
+    .flags-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .flags-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .flag-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .flag-row:last-child { border-bottom: none; }
+
+    .flag-severity {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2em 0.5em;
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 0.1em;
+    }
+
+    .sev-high { background: rgba(248,113,113,0.15); color: var(--red); }
+    .sev-medium { background: rgba(251,146,60,0.15); color: var(--orange); }
+    .sev-low { background: rgba(250,204,21,0.12); color: var(--yellow); }
+
+    .flag-detail { flex: 1; }
+    .flag-component { color: var(--muted); font-size: 0.8rem; text-transform: capitalize; }
+
+    .no-flags {
+      padding: 1.25rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-row span { font-family: 'SF Mono', 'Fira Code', monospace; }
+
+    .btn-secondary {
+      width: 100%;
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .btn-secondary:hover { border-color: #555; }
+
+    .error-card {
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.25);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+    }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── Gate ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">StreetScope</div>
+    <div class="gate-eyebrow">Early Access</div>
+    <h1>Enter your access code</h1>
+    <p>Codes are issued by StreetScope Labs.<br><a href="/">Don't have one? Request access →</a></p>
+    <form id="gate-form" autocomplete="off">
+      <input id="code-input" type="text" placeholder="XXXX-XXXX-XXX"
+             spellcheck="false" autocorrect="off" autocapitalize="characters" />
+      <button type="submit" class="btn-primary">Unlock →</button>
+      <p id="gate-error" class="gate-error" hidden>Invalid code. Check your invitation and try again.</p>
+    </form>
+  </div>
+</div>
+
+<!-- ── App ── -->
+<div id="app" hidden>
+  <div id="upload-section">
+    <div class="app-nav">
+      <span class="app-nav-logo">StreetScope</span>
+      <a href="/">streetscope.app</a>
+    </div>
+
+    <div class="section-label">Property Analysis</div>
+    <h2>Analyze an exterior</h2>
+    <p>Film a 20–30 second walk-by clip of the front facade. Upload it here and get a structured condition score in about 30 seconds.</p>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="video/*" />
+      <div class="drop-icon">⬆</div>
+      <h3>Tap to select a video</h3>
+      <p>MP4, MOV, or any smartphone format · Max 500 MB</p>
+    </div>
+
+    <div id="file-info" hidden class="file-selected">
+      <span>🎬</span>
+      <span class="file-name" id="file-name"></span>
+      <span class="file-size" id="file-size"></span>
+    </div>
+
+    <button class="btn-primary" id="run-btn" disabled>Select a clip to begin</button>
+
+    <div class="hint">
+      <strong>For best results:</strong> 20–30 seconds, front-facing, good daylight.
+      Walk or roll slowly past the property. No need to stop or pan back.
+    </div>
+  </div>
+
+  <!-- Processing -->
+  <div id="processing-section" hidden>
+    <div class="app-nav">
+      <span class="app-nav-logo">StreetScope</span>
+    </div>
+    <div style="padding: 3rem 0; text-align: center;">
+      <div class="spinner"></div>
+      <div id="stage-label">Uploading clip…</div>
+      <div id="elapsed-label"></div>
+      <div id="job-id-label"></div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result-section" hidden>
+    <div class="app-nav">
+      <span class="app-nav-logo">StreetScope</span>
+      <a href="/">streetscope.app</a>
+    </div>
+
+    <div id="error-card" class="error-card" hidden>
+      <strong>Analysis failed.</strong>
+      <p id="error-msg" style="margin-top:0.5rem;font-size:0.875rem;"></p>
+    </div>
+
+    <div id="score-content">
+      <div class="score-hero" id="score-hero">
+        <div class="score-eyebrow">Condition Score</div>
+        <div class="score-number" id="score-number">—</div>
+        <div class="score-sub" id="score-sub"></div>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="meta-row" id="meta-row"></div>
+
+      <div class="components-section">
+        <div class="components-header">Component Breakdown</div>
+        <div id="components-list"></div>
+      </div>
+
+      <div class="flags-section" id="flags-section">
+        <div class="flags-header">Damage &amp; Wear Flags</div>
+        <div id="flags-list"></div>
+      </div>
+    </div>
+
+    <button class="btn-secondary" id="reset-btn">Analyze another property</button>
+  </div>
+</div>
+
+<script>
+  const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
+
+  // Access codes — SHA-256 hashes (uppercase input before hashing)
+  // To add a user (PowerShell):
+  //   [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes('CODE-HERE'))).Replace('-','').ToLower()
+  const VALID_HASHES = [
+    'df599080ce3771b8760e810b792692a31db336b853eaa228fd62bfca75dd56dd', // LABS-FOUNDING-001
+  ];
+
+  // ── Gate ─────────────────────────────────────────────────────────────────
+
+  const $ = id => document.getElementById(id);
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function isUnlocked() {
+    return sessionStorage.getItem('ss_access') === 'granted';
+  }
+
+  function unlock() {
+    sessionStorage.setItem('ss_access', 'granted');
+    $('gate').hidden = true;
+    $('app').hidden = false;
+    showSection('upload');
+  }
+
+  $('gate-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const raw = $('code-input').value.trim().toUpperCase();
+    if (!raw) return;
+    const hash = await sha256(raw);
+    if (VALID_HASHES.includes(hash)) {
+      unlock();
+    } else {
+      $('gate-error').hidden = false;
+    }
+  });
+
+  if (isUnlocked()) {
+    $('gate').hidden = true;
+    $('app').hidden = false;
+    showSection('upload');
+  }
+
+  // ── Section switcher ─────────────────────────────────────────────────────
+
+  function showSection(name) {
+    $('upload-section').hidden = name !== 'upload';
+    $('processing-section').hidden = name !== 'processing';
+    $('result-section').hidden = name !== 'result';
+    window.scrollTo(0, 0);
+  }
+
+  // ── Upload ───────────────────────────────────────────────────────────────
+
+  let selectedFile = null;
+
+  const dropZone = $('drop-zone');
+  const fileInput = $('file-input');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) setFile(f);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  function setFile(f) {
+    selectedFile = f;
+    $('file-name').textContent = f.name;
+    $('file-size').textContent = formatBytes(f.size);
+    $('file-info').hidden = false;
+    $('run-btn').disabled = false;
+    $('run-btn').textContent = 'Run Analysis →';
+  }
+
+  function formatBytes(b) {
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  $('run-btn').addEventListener('click', () => {
+    if (!selectedFile) return;
+    runAnalysis(selectedFile);
+  });
+
+  // ── Analysis pipeline ────────────────────────────────────────────────────
+
+  const STAGES = [
+    'Extracting frames…',
+    'Detecting facade components…',
+    'Segmenting regions…',
+    'Estimating depth…',
+    'Classifying materials…',
+    'Scoring condition…',
+  ];
+
+  async function runAnalysis(file) {
+    showSection('processing');
+    $('stage-label').textContent = 'Uploading clip…';
+    $('elapsed-label').textContent = '';
+    $('job-id-label').textContent = '';
+
+    const startMs = Date.now();
+    const elapsedTimer = setInterval(() => {
+      const s = ((Date.now() - startMs) / 1000).toFixed(0);
+      $('elapsed-label').textContent = `${s}s elapsed`;
+    }, 1000);
+
+    let stageTimer = null;
+
+    try {
+      // 1. Get presigned URL
+      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(file.name)}`);
+      if (!presignRes.ok) throw new Error('Failed to get upload URL');
+      const { job_id, upload_url } = await presignRes.json();
+      $('job-id-label').textContent = `job: ${job_id}`;
+
+      // 2. Upload to S3
+      const putRes = await fetch(upload_url, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': 'video/mp4' },
+      });
+      if (!putRes.ok) throw new Error('Upload failed');
+
+      // 3. Cycle through stage labels while polling
+      let stageIdx = 0;
+      $('stage-label').textContent = STAGES[stageIdx];
+      stageTimer = setInterval(() => {
+        stageIdx = (stageIdx + 1) % STAGES.length;
+        $('stage-label').textContent = STAGES[stageIdx];
+      }, 8000);
+
+      // 4. Poll for completion (max 5 min)
+      const result = await pollJob(job_id, 300);
+
+      clearInterval(stageTimer);
+      clearInterval(elapsedTimer);
+
+      renderResult(result, job_id);
+
+    } catch (err) {
+      clearInterval(elapsedTimer);
+      if (stageTimer) clearInterval(stageTimer);
+      renderError(err.message);
+    }
+  }
+
+  async function pollJob(job_id, timeoutSecs) {
+    const deadline = Date.now() + timeoutSecs * 1000;
+    while (Date.now() < deadline) {
+      await sleep(3000);
+      const res = await fetch(`${API}/job/${job_id}`);
+      if (!res.ok) continue;
+      const data = await res.json();
+      if (data.status === 'complete') return data;
+      if (data.status === 'failed') throw new Error(data.error || 'Job failed');
+    }
+    throw new Error('Timed out waiting for result. The worker may not be running.');
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ── Result rendering ─────────────────────────────────────────────────────
+
+  const COMPONENT_LABELS = {
+    roof_visible: 'Roof (visible)',
+    siding: 'Siding',
+    paint: 'Paint',
+    windows: 'Windows',
+    gutters: 'Gutters',
+    trim: 'Trim',
+    foundation_visible: 'Foundation',
+    landscaping: 'Landscaping',
+    driveway: 'Driveway',
+    walkway: 'Walkway',
+    fence: 'Fence',
+    hvac_visible: 'HVAC',
+    doors: 'Doors',
+    garage_door: 'Garage Door',
+  };
+
+  function scoreColor(s) {
+    if (s >= 80) return 'var(--green)';
+    if (s >= 60) return 'var(--yellow)';
+    if (s >= 40) return 'var(--orange)';
+    return 'var(--red)';
+  }
+
+  function scoreLabel(s) {
+    if (s >= 80) return 'Good condition';
+    if (s >= 60) return 'Fair condition';
+    if (s >= 40) return 'Poor condition';
+    return 'Critical issues detected';
+  }
+
+  function renderResult(data, job_id) {
+    showSection('result');
+    $('error-card').hidden = true;
+    $('score-content').hidden = false;
+
+    const result = data.result || {};
+    const score = result.top_line_score != null ? Math.round(result.top_line_score) : null;
+
+    // Score hero
+    if (score !== null) {
+      $('score-number').textContent = score;
+      $('score-number').style.color = scoreColor(score);
+      $('score-sub').textContent = scoreLabel(score);
+      const bar = $('score-bar');
+      bar.style.width = score + '%';
+      bar.style.background = scoreColor(score);
+    } else {
+      $('score-number').textContent = '—';
+      $('score-sub').textContent = 'Insufficient coverage — try a longer clip';
+    }
+
+    // Meta
+    const scored = result.scored_at ? new Date(result.scored_at).toLocaleString() : '';
+    const schema = result.schema_version || '';
+    $('meta-row').innerHTML = `<span>job: ${job_id}</span>${scored ? `<span>scored: ${scored}</span>` : ''}${schema ? `<span>schema: ${schema}</span>` : ''}`;
+
+    // Components
+    const comps = result.components || {};
+    const detected = Object.entries(comps)
+      .filter(([, v]) => v.detected)
+      .sort(([, a], [, b]) => (b.condition_score ?? -1) - (a.condition_score ?? -1));
+
+    const list = $('components-list');
+    if (detected.length === 0) {
+      list.innerHTML = '<div style="padding:1.25rem;color:var(--muted);font-size:0.875rem;">No components detected. Try a longer or closer clip.</div>';
+    } else {
+      list.innerHTML = detected.map(([key, v]) => {
+        const label = COMPONENT_LABELS[key] || key.replace(/_/g, ' ');
+        const mat = v.material ? `<div class="component-material">${v.material}</div>` : '';
+        let scoreHtml;
+        if (v.condition_score != null) {
+          const s = Math.round(v.condition_score);
+          const color = scoreColor(s);
+          scoreHtml = `
+            <div class="component-score-wrap">
+              <div class="component-bar">
+                <div class="component-bar-fill" style="width:${s}%;background:${color}"></div>
+              </div>
+              <div class="component-score-num" style="color:${color}">${s}</div>
+            </div>`;
+        } else {
+          scoreHtml = `<div class="no-coverage">low coverage</div>`;
+        }
+        return `<div class="component-row">
+          <div class="component-name">${label}${mat}</div>
+          ${scoreHtml}
+        </div>`;
+      }).join('');
+    }
+
+    // Damage flags
+    const allFlags = [];
+    for (const [comp, v] of Object.entries(comps)) {
+      for (const f of (v.damage_flags || [])) {
+        allFlags.push({ ...f, component: comp });
+      }
+    }
+
+    const sevOrder = { high: 0, medium: 1, low: 2 };
+    allFlags.sort((a, b) => (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3));
+
+    const flagsList = $('flags-list');
+    if (allFlags.length === 0) {
+      flagsList.innerHTML = '<div class="no-flags"><span>✓</span> No damage or wear flags detected.</div>';
+    } else {
+      flagsList.innerHTML = allFlags.map(f => {
+        const compLabel = COMPONENT_LABELS[f.component] || f.component.replace(/_/g, ' ');
+        const sevClass = `sev-${f.severity}`;
+        const conf = f.confidence != null ? ` · ${Math.round(f.confidence * 100)}% confidence` : '';
+        return `<div class="flag-row">
+          <span class="flag-severity ${sevClass}">${f.severity}</span>
+          <div class="flag-detail">
+            <div>${f.damage_type.replace(/_/g, ' ')}</div>
+            <div class="flag-component">${compLabel}${conf}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  function renderError(msg) {
+    showSection('result');
+    $('error-card').hidden = false;
+    $('error-msg').textContent = msg;
+    $('score-content').hidden = true;
+  }
+
+  $('reset-btn').addEventListener('click', () => {
+    selectedFile = null;
+    fileInput.value = '';
+    $('file-info').hidden = true;
+    $('run-btn').disabled = true;
+    $('run-btn').textContent = 'Select a clip to begin';
+    showSection('upload');
+  });
+</script>
+
+</body>
+</html>
