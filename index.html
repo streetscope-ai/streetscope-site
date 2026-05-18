@@ -3,287 +3,517 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StreetScope</title>
+  <title>StreetScope — Property Condition Intelligence</title>
+  <meta name="description" content="StreetScope turns a 20-second smartphone clip into a structured, defensible property condition score. Built for insurance carriers, lenders, and anyone curious about a property they walk past." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --border: #222;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #f0f0f0;
+      --green: #4ade80;
+      --red: #f87171;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: system-ui, sans-serif;
-      background: #0f0f0f;
-      color: #f0f0f0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .nav-cta {
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* ── Sections ── */
+    section { padding: 5rem 2rem; max-width: 900px; margin: 0 auto; }
+
+    /* ── Hero ── */
+    .hero {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding-top: 6rem;
+      max-width: 900px;
+      margin: 0 auto;
     }
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--muted); }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 3rem;
+      line-height: 1.7;
+    }
+    .hero-tracks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    @media (max-width: 600px) { .hero-tracks { grid-template-columns: 1fr; } }
+    .track-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .track-card .track-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .track-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .track-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+    .hero-scroll { color: var(--muted); font-size: 0.85rem; }
 
-    h1 { font-size: 2.4rem; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
-    .tagline { color: #888; font-size: 1rem; margin-bottom: 2.5rem; }
+    /* ── How it works ── */
+    .how-it-works h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .how-it-works .section-sub {
+      color: var(--muted);
+      margin-bottom: 3rem;
+      font-size: 1rem;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) { .steps { grid-template-columns: 1fr; } }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .step-num {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+    .step h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
 
-    .card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
+    /* ── Output preview ── */
+    .output-section h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .output-section .section-sub {
+      color: var(--muted);
+      margin-bottom: 3rem;
+    }
+    .score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 2rem;
-      width: 100%;
-      max-width: 480px;
+      margin-bottom: 1.5rem;
     }
-
-    .drop-zone {
-      border: 2px dashed #333;
+    .score-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .score-number { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; }
+    .score-label { color: var(--muted); font-size: 0.9rem; }
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+    }
+    .component {
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 2.5rem 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 1.25rem;
+      padding: 0.75rem;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: #555;
-      background: #222;
+    .component-name { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+    .component-score { font-size: 1rem; font-weight: 600; }
+    .component-material { font-size: 0.7rem; color: var(--muted); margin-top: 0.15rem; }
+    .flag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.78rem;
+      color: var(--red);
+      margin-top: 0.75rem;
+      margin-right: 0.4rem;
     }
-    .drop-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .drop-zone .label { color: #aaa; font-size: 0.9rem; }
-    .drop-zone .filename { color: #f0f0f0; font-size: 0.95rem; margin-top: 0.4rem; font-weight: 500; }
 
-    #file-input { display: none; }
+    /* ── For who ── */
+    .for-who h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .for-who .section-sub { color: var(--muted); margin-bottom: 3rem; }
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 640px) { .audience-grid { grid-template-columns: 1fr; } }
+    .audience-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .audience-card .audience-type {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .audience-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .audience-card p { font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
 
-    button {
+    /* ── Access form ── */
+    .access-section {
+      border-top: 1px solid var(--border);
+      padding-top: 5rem;
+    }
+    .access-section h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .access-section .section-sub { color: var(--muted); margin-bottom: 3rem; }
+
+    .form-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 520px;
+    }
+    .form-group { margin-bottom: 1.25rem; }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    input, select, textarea {
       width: 100%;
-      padding: 0.8rem;
-      background: #f0f0f0;
-      color: #0f0f0f;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #555; }
+    select option { background: var(--surface); }
+    textarea { resize: vertical; min-height: 80px; }
+    .submit-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--text);
+      color: var(--bg);
       border: none;
       border-radius: 8px;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
+      margin-top: 0.5rem;
       transition: background 0.15s;
     }
-    button:hover:not(:disabled) { background: #ddd; }
-    button:disabled { background: #333; color: #666; cursor: default; }
-
-    .status {
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .progress-bar-wrap {
-      background: #2a2a2a;
-      border-radius: 4px;
-      height: 6px;
-      margin: 0.75rem 0;
-      overflow: hidden;
-      display: none;
-    }
-    .progress-bar {
-      height: 100%;
-      background: #f0f0f0;
-      width: 0%;
-      transition: width 0.2s;
-    }
-
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.35rem 0;
-      color: #666;
-      font-size: 0.88rem;
-    }
-    .step.active { color: #f0f0f0; }
-    .step.done { color: #5a5; }
-    .step.error { color: #c55; }
-    .step .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-      flex-shrink: 0;
-    }
-
-    .result {
-      margin-top: 1.25rem;
-      background: #111;
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      padding: 1rem;
-      display: none;
-    }
-    .result h3 { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
-    .result pre {
-      font-family: ui-monospace, monospace;
+    .submit-btn:hover { background: #ddd; }
+    .form-note {
       font-size: 0.78rem;
-      color: #aaa;
-      white-space: pre-wrap;
-      word-break: break-all;
+      color: var(--muted);
+      margin-top: 1rem;
+      text-align: center;
     }
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: var(--green);
+      font-size: 1rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
   </style>
 </head>
 <body>
 
-<h1>StreetScope</h1>
-<p class="tagline">Camera-driven residential intelligence.</p>
+<nav>
+  <span class="nav-logo">StreetScope</span>
+  <a class="nav-cta" href="#access">Request Access</a>
+</nav>
 
-<div class="card">
-  <div class="drop-zone" id="drop-zone">
-    <div class="icon">&#127909;</div>
-    <div class="label">Drop a video here or <u>browse</u></div>
-    <div class="filename" id="filename-label"></div>
-  </div>
-  <input type="file" id="file-input" accept="video/*" />
-
-  <button id="analyze-btn" disabled>Analyze Property</button>
-
-  <div class="status" id="status" style="display:none">
-    <div class="progress-bar-wrap" id="progress-wrap">
-      <div class="progress-bar" id="progress-bar"></div>
+<!-- ── Hero ── -->
+<div style="padding: 0 2rem;">
+  <div class="hero">
+    <p class="hero-eyebrow">Ground-level property intelligence</p>
+    <h1>Know what a satellite<br /><em>can't see.</em></h1>
+    <p class="hero-sub">
+      A 20-second smartphone clip — filmed walking, skating, or driving past a property —
+      becomes a structured, defensible exterior condition score. Siding, paint, gutters,
+      windows, trim, foundation, and more.
+    </p>
+    <div class="hero-tracks">
+      <div class="track-card">
+        <div class="track-label">For professionals</div>
+        <h3>Underwrite on real facade data</h3>
+        <p>Insurance carriers, lenders, and property managers get per-property condition records via API — fresh enough to actually use in underwriting workflows.</p>
+      </div>
+      <div class="track-card">
+        <div class="track-label">For the curious</div>
+        <h3>Score any property you walk past</h3>
+        <p>Vacation home you spotted. Investment property you're researching. House on a block you're considering. Film it, get a score, know what you're looking at.</p>
+      </div>
     </div>
-    <div class="step" id="step-presign"><span class="dot"></span> Requesting upload slot</div>
-    <div class="step" id="step-upload"><span class="dot"></span> Uploading video</div>
-    <div class="step" id="step-queue"><span class="dot"></span> Queued for analysis</div>
-    <div class="step" id="step-inference"><span class="dot"></span> Running inference</div>
-    <div class="step" id="step-done"><span class="dot"></span> Complete</div>
-  </div>
-
-  <div class="result" id="result">
-    <h3>Result</h3>
-    <pre id="result-body"></pre>
+    <p class="hero-scroll">↓ See how it works</p>
   </div>
 </div>
 
+<!-- ── How it works ── -->
+<section class="how-it-works" id="how">
+  <h2>Three steps. Under two minutes.</h2>
+  <p class="section-sub">No app install. Works in any mobile browser.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h4>Film a 20-second clip</h4>
+      <p>Walk or drive past the front of the property. Keep the facade in frame. That's it — handheld is fine.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h4>Upload and wait ~60 seconds</h4>
+      <p>Our local GPU pipeline runs frame extraction, object detection, segmentation, depth, and material classification on your clip.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h4>Get a structured condition record</h4>
+      <p>A top-line score plus per-component breakdown — siding, paint, windows, gutters, trim, foundation, driveway, and more — each with confidence level and evidence frames.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Output preview ── -->
+<section class="output-section" id="output">
+  <h2>What the output looks like</h2>
+  <p class="section-sub">Machine-readable JSON for integrations. Human-readable cards for everyone else.</p>
+  <div class="score-card">
+    <div class="score-header">
+      <span class="score-number">74</span>
+      <span class="score-label">/ 100 condition score<br /><span style="font-size:0.78rem">1521 Maple St · Suburban ranch · Captured 2026-05-18</span></span>
+    </div>
+    <div class="component-grid">
+      <div class="component">
+        <div class="component-name">Siding</div>
+        <div class="component-score">68</div>
+        <div class="component-material">Vinyl</div>
+      </div>
+      <div class="component">
+        <div class="component-name">Paint</div>
+        <div class="component-score">62</div>
+        <div class="component-material">Fading</div>
+      </div>
+      <div class="component">
+        <div class="component-name">Gutters</div>
+        <div class="component-score">55</div>
+        <div class="component-material">Aluminum</div>
+      </div>
+      <div class="component">
+        <div class="component-name">Windows</div>
+        <div class="component-score">88</div>
+        <div class="component-material">Vinyl frame</div>
+      </div>
+      <div class="component">
+        <div class="component-name">Driveway</div>
+        <div class="component-score">71</div>
+        <div class="component-material">Concrete</div>
+      </div>
+      <div class="component">
+        <div class="component-name">Foundation</div>
+        <div class="component-score">90</div>
+        <div class="component-material">Concrete</div>
+      </div>
+    </div>
+    <div>
+      <span class="flag">⚠ Gutters sagging — medium severity</span>
+      <span class="flag">⚠ Paint peeling — low severity</span>
+      <span class="flag">⚠ Driveway cracking — low severity</span>
+    </div>
+  </div>
+  <p style="font-size:0.82rem; color:var(--muted);">Example output. All scores, flags, and materials are linked to specific evidence frames from the source clip.</p>
+</section>
+
+<!-- ── For who ── -->
+<section class="for-who" id="who">
+  <h2>Built for two audiences.</h2>
+  <p class="section-sub">Same pipeline. Same output. Different workflows.</p>
+  <div class="audience-grid">
+    <div class="audience-card">
+      <div class="audience-type">Insurance carriers</div>
+      <h3>Facade-level underwriting data at renewal scale</h3>
+      <p>Cape Analytics sees the roof. StreetScope sees the siding, windows, paint, gutters, and trim — the curb-level details that drive claim frequency and adverse selection.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-type">Mortgage lenders</div>
+      <h3>Condition signal on every loan in the pool</h3>
+      <p>Per-property exterior records cheap enough to run on an entire portfolio. Consistent signal across geographies and housing stock ages.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-type">Real estate agents</div>
+      <h3>Third-party defensible condition at listing time</h3>
+      <p>Attach an exterior condition record to every listing. Faster pre-listing triage. Defensible documentation if a buyer disputes condition later.</p>
+    </div>
+    <div class="audience-card">
+      <div class="audience-type">Anyone curious</div>
+      <h3>Score any property you walk or drive past</h3>
+      <p>Vacation home shopping. Investment property research. Neighborhood due diligence. Film a 20-second clip and know what you're looking at.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Access form ── -->
+<section class="access-section" id="access">
+  <h2>Request early access.</h2>
+  <p class="section-sub">We're onboarding a small group of early users. Tell us what you're working on.</p>
+
+  <div class="form-wrap">
+    <div class="success-msg" id="success">
+      ✓ You're on the list. We'll be in touch at streetscope@proton.me.
+    </div>
+    <form id="access-form" action="https://formspree.io/f/mzdwzgrv" method="POST">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your name" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@company.com" required />
+      </div>
+      <div class="form-group">
+        <label for="role">I am a…</label>
+        <select id="role" name="role" required>
+          <option value="" disabled selected>Select your role</option>
+          <option value="insurance">Insurance underwriter / carrier</option>
+          <option value="lender">Mortgage lender / investor</option>
+          <option value="agent">Real estate agent</option>
+          <option value="pm">Property manager</option>
+          <option value="consumer">Just curious — personal use</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="usecase">What would you use exterior condition data for?</label>
+        <textarea id="usecase" name="usecase" placeholder="e.g. renewal underwriting on a 50k-policy book, evaluating a vacation home, scoring properties in a rental portfolio…"></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Request Access</button>
+      <p class="form-note">No spam. No sales calls unless you ask. Contact: streetscope@proton.me</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 StreetScope Labs · All rights reserved · <a href="mailto:streetscope@proton.me">streetscope@proton.me</a></p>
+</footer>
+
 <script>
-  const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
-  const POLL_INTERVAL_MS = 3000;
+  const form = document.getElementById('access-form');
+  const success = document.getElementById('success');
 
-  const dropZone   = document.getElementById('drop-zone');
-  const fileInput  = document.getElementById('file-input');
-  const fileLabel  = document.getElementById('filename-label');
-  const analyzeBtn = document.getElementById('analyze-btn');
-  const statusBox  = document.getElementById('status');
-  const progressWrap = document.getElementById('progress-wrap');
-  const progressBar  = document.getElementById('progress-bar');
-  const resultBox  = document.getElementById('result');
-  const resultBody = document.getElementById('result-body');
-
-  let selectedFile = null;
-
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-  dropZone.addEventListener('drop', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    dropZone.classList.remove('dragover');
-    setFile(e.dataTransfer.files[0]);
-  });
-  fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
-
-  function setFile(f) {
-    if (!f) return;
-    selectedFile = f;
-    fileLabel.textContent = f.name;
-    analyzeBtn.disabled = false;
-  }
-
-  analyzeBtn.addEventListener('click', run);
-
-  async function run() {
-    analyzeBtn.disabled = true;
-    statusBox.style.display = 'block';
-    resultBox.style.display = 'none';
-    resetSteps();
-
+    const data = new FormData(form);
     try {
-      // 1. Presign
-      setStep('presign', 'active');
-      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(selectedFile.name)}`);
-      if (!presignRes.ok) throw new Error(`Presign failed: ${presignRes.status}`);
-      const { job_id, upload_url } = await presignRes.json();
-      setStep('presign', 'done');
-
-      // 2. Upload to S3
-      setStep('upload', 'active');
-      progressWrap.style.display = 'block';
-      await uploadWithProgress(upload_url, selectedFile);
-      progressWrap.style.display = 'none';
-      setStep('upload', 'done');
-
-      // 3. Poll
-      setStep('queue', 'active');
-      await poll(job_id);
-
-    } catch (err) {
-      markCurrentError();
-      console.error(err);
-    } finally {
-      analyzeBtn.disabled = false;
-    }
-  }
-
-  function uploadWithProgress(url, file) {
-    return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('PUT', url);
-      xhr.setRequestHeader('Content-Type', 'video/mp4');
-      xhr.upload.addEventListener('progress', e => {
-        if (e.lengthComputable) progressBar.style.width = `${(e.loaded / e.total) * 100}%`;
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' },
       });
-      xhr.addEventListener('load', () => xhr.status < 300 ? resolve() : reject(new Error(`S3 upload ${xhr.status}`)));
-      xhr.addEventListener('error', () => reject(new Error('Upload network error')));
-      xhr.send(file);
-    });
-  }
-
-  async function poll(job_id) {
-    while (true) {
-      const res = await fetch(`${API}/job/${job_id}`);
-      if (!res.ok) throw new Error(`Poll failed: ${res.status}`);
-      const job = await res.json();
-
-      if (job.status === 'processing') {
-        setStep('queue', 'done');
-        setStep('inference', 'active');
-      } else if (job.status === 'complete') {
-        setStep('queue', 'done');
-        setStep('inference', 'done');
-        setStep('done', 'done');
-        showResult(job);
-        return;
-      } else if (job.status === 'failed') {
-        throw new Error(job.error || 'Job failed');
+      if (res.ok) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        alert('Something went wrong — email us directly at streetscope@proton.me');
       }
-
-      await sleep(POLL_INTERVAL_MS);
+    } catch {
+      alert('Something went wrong — email us directly at streetscope@proton.me');
     }
-  }
-
-  function showResult(job) {
-    const display = job.result ?? job;
-    resultBody.textContent = JSON.stringify(display, null, 2);
-    resultBox.style.display = 'block';
-  }
-
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-
-  const steps = ['presign', 'upload', 'queue', 'inference', 'done'];
-
-  function resetSteps() {
-    steps.forEach(s => setStep(s, ''));
-    progressBar.style.width = '0%';
-  }
-
-  function setStep(name, state) {
-    const el = document.getElementById(`step-${name}`);
-    el.className = `step ${state}`;
-  }
-
-  function markCurrentError() {
-    const active = document.querySelector('.step.active');
-    if (active) active.className = 'step error';
-  }
-
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  });
 </script>
+
 </body>
 </html>
