@@ -453,9 +453,9 @@
 
   <div class="form-wrap">
     <div class="success-msg" id="success">
-      ✓ You're on the list. We'll be in touch at streetscope@proton.me.
+      ✓ Check your email — your access code is on its way.
     </div>
-    <form id="access-form" action="https://formspree.io/f/mzdwzgrv" method="POST">
+    <form id="access-form">
       <div class="form-group">
         <label for="name">Name</label>
         <input type="text" id="name" name="name" placeholder="Your name" required />
@@ -491,25 +491,42 @@
 </footer>
 
 <script>
+  const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
   const form = document.getElementById('access-form');
   const success = document.getElementById('success');
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    const data = new FormData(form);
+    const btn = form.querySelector('.submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const payload = {
+      name:     form.querySelector('#name').value.trim(),
+      email:    form.querySelector('#email').value.trim(),
+      use_case: [
+        form.querySelector('#role').value,
+        form.querySelector('#usecase').value.trim(),
+      ].filter(Boolean).join(' — '),
+    };
+
     try {
-      const res = await fetch(form.action, {
+      const res = await fetch(`${API}/request-access`, {
         method: 'POST',
-        body: data,
-        headers: { 'Accept': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         form.style.display = 'none';
         success.style.display = 'block';
       } else {
+        btn.disabled = false;
+        btn.textContent = 'Request Access';
         alert('Something went wrong — email us directly at streetscope@proton.me');
       }
     } catch {
+      btn.disabled = false;
+      btn.textContent = 'Request Access';
       alert('Something went wrong — email us directly at streetscope@proton.me');
     }
   });

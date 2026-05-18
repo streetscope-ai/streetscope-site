@@ -582,28 +582,21 @@
 <script>
   const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
 
-  // Access codes — SHA-256 hashes (uppercase input before hashing)
-  // To add a user (PowerShell):
-  //   [System.BitConverter]::ToString([System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes('CODE-HERE'))).Replace('-','').ToLower()
-  const VALID_HASHES = [
-    'df599080ce3771b8760e810b792692a31db336b853eaa228fd62bfca75dd56dd', // LABS-FOUNDING-001
-  ];
-
   // ── Gate ─────────────────────────────────────────────────────────────────
 
   const $ = id => document.getElementById(id);
-
-  async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
 
   function isUnlocked() {
     return sessionStorage.getItem('ss_access') === 'granted';
   }
 
-  function unlock() {
+  function getCodeId() {
+    return sessionStorage.getItem('ss_code_id') || '';
+  }
+
+  function unlock(code_id) {
     sessionStorage.setItem('ss_access', 'granted');
+    sessionStorage.setItem('ss_code_id', code_id);
     $('gate').hidden = true;
     $('app').hidden = false;
     showSection('upload');
@@ -611,13 +604,32 @@
 
   $('gate-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const raw = $('code-input').value.trim().toUpperCase();
-    if (!raw) return;
-    const hash = await sha256(raw);
-    if (VALID_HASHES.includes(hash)) {
-      unlock();
-    } else {
+    const code = $('code-input').value.trim().toUpperCase();
+    if (!code) return;
+
+    const btn = e.submitter;
+    btn.disabled = true;
+    btn.textContent = 'Checking…';
+    $('gate-error').hidden = true;
+
+    try {
+      const res = await fetch(`${API}/verify-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        unlock(data.code_id);
+      } else {
+        $('gate-error').hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Unlock →';
+      }
+    } catch {
       $('gate-error').hidden = false;
+      btn.disabled = false;
+      btn.textContent = 'Unlock →';
     }
   });
 
@@ -702,7 +714,8 @@
 
     try {
       // 1. Get presigned URL
-      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(file.name)}`);
+      const code_id = getCodeId();
+      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(file.name)}&code_id=${encodeURIComponent(code_id)}`);
       if (!presignRes.ok) throw new Error('Failed to get upload URL');
       const { job_id, upload_url } = await presignRes.json();
       $('job-id-label').textContent = `job: ${job_id}`;
