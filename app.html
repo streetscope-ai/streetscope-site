@@ -18,6 +18,7 @@
       --yellow: #facc15;
       --orange: #fb923c;
       --red: #f87171;
+      --blue: #60a5fa;
     }
 
     body {
@@ -46,33 +47,10 @@
       padding: 2.5rem 2rem;
     }
 
-    .gate-logo {
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.03em;
-      margin-bottom: 0.5rem;
-    }
-
-    .gate-eyebrow {
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 2rem;
-    }
-
-    .gate-card h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .gate-card p {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-bottom: 1.75rem;
-    }
-
+    .gate-logo { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+    .gate-eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2rem; }
+    .gate-card h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .gate-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.75rem; }
     .gate-card a { color: var(--text); }
 
     #code-input {
@@ -109,15 +87,11 @@
     .btn-primary:hover { opacity: 0.9; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .gate-error {
-      color: var(--red);
-      font-size: 0.85rem;
-      margin-top: 0.75rem;
-    }
+    .gate-error { color: var(--red); font-size: 0.85rem; margin-top: 0.75rem; }
 
     /* ── App shell ── */
     #app {
-      max-width: 640px;
+      max-width: 680px;
       margin: 0 auto;
       padding: 1rem 1.25rem 4rem;
     }
@@ -132,14 +106,8 @@
     }
 
     .app-nav-logo { font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
+    .app-nav a { color: var(--muted); text-decoration: none; font-size: 0.875rem; }
 
-    .app-nav a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.875rem;
-    }
-
-    /* ── Upload ── */
     .section-label {
       font-size: 0.75rem;
       letter-spacing: 0.12em;
@@ -148,6 +116,7 @@
       margin-bottom: 1rem;
     }
 
+    /* ── Upload section ── */
     #upload-section h2 {
       font-size: 1.6rem;
       font-weight: 800;
@@ -155,7 +124,7 @@
       margin-bottom: 0.5rem;
     }
 
-    #upload-section p {
+    #upload-section > p {
       color: var(--muted);
       font-size: 0.95rem;
       margin-bottom: 2rem;
@@ -164,11 +133,10 @@
     .drop-zone {
       border: 2px dashed var(--border);
       border-radius: 12px;
-      padding: 2.5rem 1.5rem;
+      padding: 3rem 1.5rem;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
-      margin-bottom: 1.25rem;
       position: relative;
     }
 
@@ -179,17 +147,8 @@
 
     .drop-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 
-    .drop-zone h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-
-    .drop-zone p {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin: 0;
-    }
+    .drop-zone h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .drop-zone p { color: var(--muted); font-size: 0.85rem; margin: 0; }
 
     .drop-zone input[type=file] {
       position: absolute;
@@ -200,26 +159,54 @@
       height: 100%;
     }
 
-    .file-selected {
+    /* ── File queue list (pre-submit) ── */
+    #file-list {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .file-item {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 0.75rem 1rem;
+      padding: 0.65rem 1rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      margin-bottom: 1.25rem;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
     }
 
-    .file-selected .file-name {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .file-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-item-size { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+    .file-item-remove {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+      padding: 0 0.25rem;
+      transition: color 0.1s;
+    }
+    .file-item-remove:hover { color: var(--red); }
+
+    .upload-actions {
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
     }
 
-    .file-selected .file-size { color: var(--muted); font-size: 0.8rem; flex-shrink: 0; }
+    .upload-actions .btn-primary { flex: 1; }
+
+    .file-count-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
 
     .hint {
       background: var(--surface);
@@ -233,97 +220,166 @@
 
     .hint strong { color: var(--text); }
 
-    /* ── Processing ── */
-    #processing-section {
-      text-align: center;
-      padding: 3rem 0;
+    /* ── Queue section ── */
+    .queue-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
     }
 
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 3px solid var(--border);
-      border-top-color: var(--text);
+    .queue-header h2 { font-size: 1.4rem; font-weight: 800; }
+    .queue-header .queue-sub { font-size: 0.875rem; color: var(--muted); }
+
+    /* Compact add-more zone */
+    .add-more-zone {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--muted);
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, background 0.15s;
+      margin-bottom: 1.25rem;
+    }
+
+    .add-more-zone:hover { border-color: #555; background: var(--surface); color: var(--text); }
+    .add-more-zone input[type=file] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Job cards ── */
+    .job-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+
+    .job-card.is-complete { border-color: #2a2a2a; }
+    .job-card.is-failed { border-color: rgba(248,113,113,0.25); }
+
+    .job-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .job-card-header:hover .job-filename { color: var(--text); }
+
+    .job-filename {
+      flex: 1;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--muted);
+      transition: color 0.15s;
+    }
+
+    .job-card.is-complete .job-filename,
+    .job-card.is-failed .job-filename { color: var(--text); }
+
+    .job-size { font-size: 0.8rem; color: #555; flex-shrink: 0; }
+
+    .job-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2em 0.6em;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .badge-queued    { background: rgba(136,136,136,0.12); color: #666; }
+    .badge-uploading { background: rgba(96,165,250,0.12);  color: var(--blue); }
+    .badge-analyzing { background: rgba(250,204,21,0.12);  color: var(--yellow); }
+    .badge-complete  { background: rgba(74,222,128,0.12);  color: var(--green); }
+    .badge-failed    { background: rgba(248,113,113,0.12); color: var(--red); }
+
+    .job-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--muted);
       border-radius: 50%;
       animation: spin 0.9s linear infinite;
-      margin: 0 auto 1.5rem;
+      flex-shrink: 0;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    #stage-label {
-      font-size: 0.95rem;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-      min-height: 1.4em;
-    }
-
-    #elapsed-label {
-      font-size: 0.8rem;
+    .job-chevron {
       color: #555;
-    }
-
-    #job-id-label {
       font-size: 0.75rem;
-      color: #444;
-      margin-top: 2rem;
-      font-family: 'SF Mono', 'Fira Code', monospace;
+      flex-shrink: 0;
+      transition: transform 0.2s;
     }
 
-    /* ── Result ── */
-    .score-hero {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
+    .job-card.expanded .job-chevron { transform: rotate(180deg); }
+
+    /* ── Inline result ── */
+    .job-result {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem;
     }
 
-    .score-eyebrow {
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.75rem;
+    .job-result[hidden] { display: none; }
+
+    /* Score hero (compact version inside job card) */
+    .result-score-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
     }
 
-    .score-number {
-      font-size: 5rem;
+    .result-score-big {
+      font-size: 3rem;
       font-weight: 900;
       line-height: 1;
       letter-spacing: -0.04em;
-      margin-bottom: 0.25rem;
+      flex-shrink: 0;
     }
 
-    .score-sub { color: var(--muted); font-size: 0.9rem; }
+    .result-score-detail { flex: 1; }
+    .result-score-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
 
     .score-bar-bg {
-      height: 6px;
+      height: 5px;
       background: var(--border);
       border-radius: 3px;
-      margin: 1.25rem 0 0;
       overflow: hidden;
     }
 
-    .score-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.8s ease;
-    }
+    .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
 
+    /* Component list */
     .components-section {
-      background: var(--surface);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .components-header {
-      padding: 1rem 1.25rem;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -334,65 +390,34 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 0.85rem 1.25rem;
+      padding: 0.65rem 1rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
+      font-size: 0.875rem;
     }
 
     .component-row:last-child { border-bottom: none; }
+    .component-name { flex: 1; text-transform: capitalize; }
+    .component-material { font-size: 0.75rem; color: var(--muted); }
 
-    .component-name {
-      flex: 1;
-      text-transform: capitalize;
-    }
-
-    .component-material {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
-
-    .component-score-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    .component-bar {
-      width: 80px;
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
+    .component-score-wrap { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .component-bar { width: 64px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
     .component-bar-fill { height: 100%; border-radius: 2px; }
+    .component-score-num { font-size: 0.8rem; font-weight: 600; width: 2.5em; text-align: right; }
+    .no-coverage { font-size: 0.75rem; color: #555; flex-shrink: 0; }
 
-    .component-score-num {
-      font-size: 0.85rem;
-      font-weight: 600;
-      width: 2.5em;
-      text-align: right;
-    }
-
-    .no-coverage {
-      font-size: 0.8rem;
-      color: #555;
-      flex-shrink: 0;
-    }
-
+    /* Flags */
     .flags-section {
-      background: var(--surface);
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
 
     .flags-header {
-      padding: 1rem 1.25rem;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -403,9 +428,9 @@
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      padding: 0.85rem 1.25rem;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.875rem;
+      font-size: 0.85rem;
     }
 
     .flag-row:last-child { border-bottom: none; }
@@ -421,56 +446,33 @@
       margin-top: 0.1em;
     }
 
-    .sev-high { background: rgba(248,113,113,0.15); color: var(--red); }
-    .sev-medium { background: rgba(251,146,60,0.15); color: var(--orange); }
-    .sev-low { background: rgba(250,204,21,0.12); color: var(--yellow); }
+    .sev-high   { background: rgba(248,113,113,0.15); color: var(--red); }
+    .sev-medium { background: rgba(251,146,60,0.15);  color: var(--orange); }
+    .sev-low    { background: rgba(250,204,21,0.12);  color: var(--yellow); }
 
     .flag-detail { flex: 1; }
-    .flag-component { color: var(--muted); font-size: 0.8rem; text-transform: capitalize; }
+    .flag-component { color: var(--muted); font-size: 0.78rem; text-transform: capitalize; }
 
     .no-flags {
-      padding: 1.25rem;
+      padding: 1rem;
       color: var(--muted);
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .meta-row {
-      display: flex;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .meta-row span { font-family: 'SF Mono', 'Fira Code', monospace; }
-
-    .btn-secondary {
-      width: 100%;
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      padding: 0.85rem 1rem;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-
-    .btn-secondary:hover { border-color: #555; }
-
-    .error-card {
-      background: rgba(248,113,113,0.08);
-      border: 1px solid rgba(248,113,113,0.25);
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
+    .error-inline {
       color: var(--red);
-      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+      padding: 0.5rem 0;
+    }
+
+    .job-meta {
+      font-size: 0.75rem;
+      color: #555;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      margin-bottom: 1rem;
     }
 
     [hidden] { display: none !important; }
@@ -496,6 +498,8 @@
 
 <!-- ── App ── -->
 <div id="app" hidden>
+
+  <!-- Upload section -->
   <div id="upload-section">
     <div class="app-nav">
       <span class="app-nav-logo">StreetScope</span>
@@ -503,115 +507,78 @@
     </div>
 
     <div class="section-label">Property Analysis</div>
-    <h2>Analyze an exterior</h2>
-    <p>Film a 20–30 second walk-by clip of the front facade. Upload it here and get a structured condition score in about 30 seconds.</p>
+    <h2>Analyze exteriors</h2>
+    <p>Select one or more walk-by clips. Each gets a structured condition score in about 30 seconds.</p>
 
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept="video/*" />
+      <input type="file" id="file-input" accept="video/*" multiple />
       <div class="drop-icon">⬆</div>
-      <h3>Tap to select a video</h3>
-      <p>MP4, MOV, or any smartphone format · Max 500 MB</p>
+      <h3>Drop clips here or tap to browse</h3>
+      <p>Select multiple files at once &nbsp;·&nbsp; MP4, MOV, or any smartphone format</p>
     </div>
 
-    <div id="file-info" hidden class="file-selected">
-      <span>🎬</span>
-      <span class="file-name" id="file-name"></span>
-      <span class="file-size" id="file-size"></span>
-    </div>
+    <div id="file-list"></div>
 
-    <button class="btn-primary" id="run-btn" disabled>Select a clip to begin</button>
+    <div id="upload-actions" class="upload-actions" hidden>
+      <button class="btn-primary" id="run-btn">Analyze →</button>
+      <span class="file-count-label" id="file-count-label"></span>
+    </div>
 
     <div class="hint">
-      <strong>For best results:</strong> 20–30 seconds, front-facing, good daylight.
-      Walk or roll slowly past the property. No need to stop or pan back.
+      <strong>For best results:</strong> 5–30 seconds, front-facing, good daylight.
+      Walk or roll slowly past the property.
     </div>
   </div>
 
-  <!-- Processing -->
-  <div id="processing-section" hidden>
-    <div class="app-nav">
-      <span class="app-nav-logo">StreetScope</span>
-    </div>
-    <div style="padding: 3rem 0; text-align: center;">
-      <div class="spinner"></div>
-      <div id="stage-label">Uploading clip…</div>
-      <div id="elapsed-label"></div>
-      <div id="job-id-label"></div>
-    </div>
-  </div>
-
-  <!-- Result -->
-  <div id="result-section" hidden>
+  <!-- Queue section -->
+  <div id="queue-section" hidden>
     <div class="app-nav">
       <span class="app-nav-logo">StreetScope</span>
       <a href="/">streetscope.app</a>
     </div>
 
-    <div id="error-card" class="error-card" hidden>
-      <strong>Analysis failed.</strong>
-      <p id="error-msg" style="margin-top:0.5rem;font-size:0.875rem;"></p>
+    <div class="queue-header">
+      <div>
+        <div class="section-label">Analysis Queue</div>
+        <h2 id="queue-title">Analyzing…</h2>
+      </div>
+      <div class="queue-sub" id="queue-sub"></div>
     </div>
 
-    <div id="score-content">
-      <div class="score-hero" id="score-hero">
-        <div class="score-eyebrow">Condition Score</div>
-        <div class="score-number" id="score-number">—</div>
-        <div class="score-sub" id="score-sub"></div>
-        <div class="score-bar-bg">
-          <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
-        </div>
-      </div>
-
-      <div class="meta-row" id="meta-row"></div>
-
-      <div class="components-section">
-        <div class="components-header">Component Breakdown</div>
-        <div id="components-list"></div>
-      </div>
-
-      <div class="flags-section" id="flags-section">
-        <div class="flags-header">Damage &amp; Wear Flags</div>
-        <div id="flags-list"></div>
-      </div>
+    <div class="add-more-zone">
+      <input type="file" id="add-more-input" accept="video/*" multiple />
+      + Add more clips
     </div>
 
-    <button class="btn-secondary" id="reset-btn">Analyze another property</button>
+    <div id="job-list"></div>
   </div>
+
 </div>
 
 <script>
   const API = 'https://mnfmzo5sof.execute-api.us-east-1.amazonaws.com';
+  const $ = id => document.getElementById(id);
 
   // ── Gate ─────────────────────────────────────────────────────────────────
 
-  const $ = id => document.getElementById(id);
-
-  function isUnlocked() {
-    return sessionStorage.getItem('ss_access') === 'granted';
-  }
-
-  function getCodeId() {
-    return sessionStorage.getItem('ss_code_id') || '';
-  }
+  function isUnlocked() { return sessionStorage.getItem('ss_access') === 'granted'; }
+  function getCodeId()   { return sessionStorage.getItem('ss_code_id') || ''; }
 
   function unlock(code_id) {
     sessionStorage.setItem('ss_access', 'granted');
     sessionStorage.setItem('ss_code_id', code_id);
     $('gate').hidden = true;
     $('app').hidden = false;
-    showSection('upload');
   }
 
   $('gate-form').addEventListener('submit', async e => {
     e.preventDefault();
     const code = $('code-input').value.trim().toUpperCase();
     if (!code) return;
-
     const btn = e.submitter;
     btn.disabled = true;
     btn.textContent = 'Checking…';
     $('gate-error').hidden = true;
-
     try {
       const res = await fetch(`${API}/verify-code`, {
         method: 'POST',
@@ -636,119 +603,290 @@
   if (isUnlocked()) {
     $('gate').hidden = true;
     $('app').hidden = false;
-    showSection('upload');
   }
 
-  // ── Section switcher ─────────────────────────────────────────────────────
+  // ── File selection ────────────────────────────────────────────────────────
 
-  function showSection(name) {
-    $('upload-section').hidden = name !== 'upload';
-    $('processing-section').hidden = name !== 'processing';
-    $('result-section').hidden = name !== 'result';
-    window.scrollTo(0, 0);
-  }
+  let pendingFiles = [];
 
-  // ── Upload ───────────────────────────────────────────────────────────────
+  const dropZone   = $('drop-zone');
+  const fileInput  = $('file-input');
 
-  let selectedFile = null;
-
-  const dropZone = $('drop-zone');
-  const fileInput = $('file-input');
-
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const f = e.dataTransfer.files[0];
-    if (f) setFile(f);
+    addFiles(Array.from(e.dataTransfer.files));
   });
 
   fileInput.addEventListener('change', () => {
-    if (fileInput.files[0]) setFile(fileInput.files[0]);
+    addFiles(Array.from(fileInput.files));
+    fileInput.value = '';
   });
 
-  function setFile(f) {
-    selectedFile = f;
-    $('file-name').textContent = f.name;
-    $('file-size').textContent = formatBytes(f.size);
-    $('file-info').hidden = false;
-    $('run-btn').disabled = false;
-    $('run-btn').textContent = 'Run Analysis →';
+  function addFiles(files) {
+    const videos = files.filter(f => f.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(f.name));
+    videos.forEach(f => {
+      if (!pendingFiles.find(p => p.name === f.name && p.size === f.size)) {
+        pendingFiles.push(f);
+      }
+    });
+    renderFileList();
   }
 
-  function formatBytes(b) {
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
-    return (b / (1024 * 1024)).toFixed(1) + ' MB';
+  function removeFile(idx) {
+    pendingFiles.splice(idx, 1);
+    renderFileList();
+  }
+
+  function renderFileList() {
+    const list = $('file-list');
+    const actions = $('upload-actions');
+    const btn = $('run-btn');
+    const label = $('file-count-label');
+
+    if (pendingFiles.length === 0) {
+      list.innerHTML = '';
+      actions.hidden = true;
+      return;
+    }
+
+    list.innerHTML = pendingFiles.map((f, i) => `
+      <div class="file-item">
+        <span>🎬</span>
+        <span class="file-item-name">${escHtml(f.name)}</span>
+        <span class="file-item-size">${formatBytes(f.size)}</span>
+        <button class="file-item-remove" onclick="removeFile(${i})" title="Remove">✕</button>
+      </div>
+    `).join('');
+
+    actions.hidden = false;
+    const n = pendingFiles.length;
+    btn.textContent = n === 1 ? 'Analyze 1 clip →' : `Analyze ${n} clips →`;
+    label.textContent = '';
   }
 
   $('run-btn').addEventListener('click', () => {
-    if (!selectedFile) return;
-    runAnalysis(selectedFile);
+    if (pendingFiles.length === 0) return;
+    startQueue(pendingFiles.slice());
+    pendingFiles = [];
+    renderFileList();
   });
 
-  // ── Analysis pipeline ────────────────────────────────────────────────────
+  // ── Queue ─────────────────────────────────────────────────────────────────
 
-  const STAGES = [
-    'Extracting frames…',
-    'Detecting facade components…',
-    'Segmenting regions…',
-    'Estimating depth…',
-    'Classifying materials…',
-    'Scoring condition…',
-  ];
+  // jobs: Array<{ id, file, status, job_id, result, error, expanded }>
+  const jobs = [];
+  let jobSeq = 0;
 
-  async function runAnalysis(file) {
-    showSection('processing');
-    $('stage-label').textContent = 'Uploading clip…';
-    $('elapsed-label').textContent = '';
-    $('job-id-label').textContent = '';
+  function startQueue(files) {
+    $('upload-section').hidden = true;
+    $('queue-section').hidden = false;
 
-    const startMs = Date.now();
-    const elapsedTimer = setInterval(() => {
-      const s = ((Date.now() - startMs) / 1000).toFixed(0);
-      $('elapsed-label').textContent = `${s}s elapsed`;
-    }, 1000);
+    files.forEach(f => {
+      const job = { id: jobSeq++, file: f, status: 'queued', job_id: null, result: null, error: null, expanded: false };
+      jobs.push(job);
+      renderJob(job);
+      runJob(job);
+    });
 
-    let stageTimer = null;
+    updateQueueSummary();
+  }
 
+  $('add-more-input').addEventListener('change', e => {
+    const files = Array.from(e.target.files).filter(f =>
+      f.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(f.name)
+    );
+    e.target.value = '';
+    files.forEach(f => {
+      const job = { id: jobSeq++, file: f, status: 'queued', job_id: null, result: null, error: null, expanded: false };
+      jobs.push(job);
+      renderJob(job);
+      runJob(job);
+    });
+    updateQueueSummary();
+  });
+
+  function updateQueueSummary() {
+    const total    = jobs.length;
+    const done     = jobs.filter(j => j.status === 'complete' || j.status === 'failed').length;
+    const running  = total - done;
+    $('queue-title').textContent = running > 0 ? `Analyzing ${total} clip${total !== 1 ? 's' : ''}` : `${total} clip${total !== 1 ? 's' : ''} analyzed`;
+    $('queue-sub').textContent   = done > 0 ? `${done} / ${total} done` : '';
+  }
+
+  // ── Job card rendering ────────────────────────────────────────────────────
+
+  function jobCardId(job) { return `job-card-${job.id}`; }
+
+  function renderJob(job) {
+    const existing = document.getElementById(jobCardId(job));
+    if (existing) {
+      existing.outerHTML = jobCardHtml(job);
+    } else {
+      const el = document.createElement('div');
+      el.innerHTML = jobCardHtml(job);
+      $('job-list').appendChild(el.firstElementChild);
+    }
+    document.getElementById(jobCardId(job))
+      .querySelector('.job-card-header')
+      .addEventListener('click', () => toggleJobExpand(job));
+  }
+
+  function jobCardHtml(job) {
+    const badgeClass = { queued: 'badge-queued', uploading: 'badge-uploading', analyzing: 'badge-analyzing', complete: 'badge-complete', failed: 'badge-failed' }[job.status];
+    const badgeText  = { queued: 'Queued', uploading: 'Uploading', analyzing: 'Analyzing', complete: 'Done', failed: 'Failed' }[job.status];
+
+    const isActive  = job.status === 'uploading' || job.status === 'analyzing';
+    const isDone    = job.status === 'complete' || job.status === 'failed';
+    const cardClass = job.status === 'complete' ? 'is-complete' : job.status === 'failed' ? 'is-failed' : '';
+    const expanded  = job.expanded && isDone;
+
+    const spinner   = isActive ? `<div class="job-spinner"></div>` : '';
+    const chevron   = isDone   ? `<div class="job-chevron">▾</div>` : '';
+
+    return `
+      <div class="job-card ${cardClass} ${expanded ? 'expanded' : ''}" id="${jobCardId(job)}">
+        <div class="job-card-header">
+          ${spinner}
+          <div class="job-filename">${escHtml(job.file.name)}</div>
+          <div class="job-size">${formatBytes(job.file.size)}</div>
+          <div class="job-badge ${badgeClass}">${badgeText}</div>
+          ${chevron}
+        </div>
+        ${isDone && expanded ? `<div class="job-result">${jobResultHtml(job)}</div>` : ''}
+      </div>`;
+  }
+
+  function toggleJobExpand(job) {
+    if (job.status !== 'complete' && job.status !== 'failed') return;
+    job.expanded = !job.expanded;
+    renderJob(job);
+  }
+
+  function jobResultHtml(job) {
+    if (job.status === 'failed') {
+      return `<div class="error-inline">Analysis failed: ${escHtml(job.error || 'Unknown error')}</div>`;
+    }
+
+    const data   = job.result || {};
+    const result = data.result || {};
+    const score  = result.condition_score != null ? Math.round(result.condition_score)
+                 : result.top_line_score != null  ? Math.round(result.top_line_score)
+                 : null;
+
+    const scoreHtml = score !== null ? `
+      <div class="result-score-row">
+        <div class="result-score-big" style="color:${scoreColor(score)}">${score}</div>
+        <div class="result-score-detail">
+          <div class="result-score-label">${scoreLabel(score)}</div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:${score}%;background:${scoreColor(score)}"></div>
+          </div>
+        </div>
+      </div>` : `
+      <div style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;">
+        Insufficient coverage — try a slightly longer clip
+      </div>`;
+
+    const metaHtml = job.job_id ? `<div class="job-meta">job: ${job.job_id}</div>` : '';
+
+    // Components
+    const comps    = result.components || {};
+    const detected = Object.entries(comps)
+      .filter(([, v]) => v.detected)
+      .sort(([, a], [, b]) => (b.condition_score ?? -1) - (a.condition_score ?? -1));
+
+    let compHtml = '';
+    if (detected.length > 0) {
+      compHtml = `
+        <div class="components-section">
+          <div class="components-header">Component Breakdown</div>
+          ${detected.map(([key, v]) => {
+            const label = COMPONENT_LABELS[key] || key.replace(/_/g, ' ');
+            const mat   = v.material ? `<div class="component-material">${v.material}</div>` : '';
+            const s     = v.condition_score != null ? Math.round(v.condition_score) : null;
+            const scoreEl = s !== null
+              ? `<div class="component-score-wrap">
+                   <div class="component-bar"><div class="component-bar-fill" style="width:${s}%;background:${scoreColor(s)}"></div></div>
+                   <div class="component-score-num" style="color:${scoreColor(s)}">${s}</div>
+                 </div>`
+              : `<div class="no-coverage">low coverage</div>`;
+            return `<div class="component-row"><div class="component-name">${label}${mat}</div>${scoreEl}</div>`;
+          }).join('')}
+        </div>`;
+    }
+
+    // Damage flags
+    const allFlags = [];
+    for (const [comp, v] of Object.entries(comps)) {
+      for (const f of (v.damage_flags || [])) allFlags.push({ ...f, component: comp });
+    }
+    allFlags.sort((a, b) => ({'high':0,'medium':1,'low':2}[a.severity]??3) - ({'high':0,'medium':1,'low':2}[b.severity]??3));
+
+    const flagsHtml = `
+      <div class="flags-section">
+        <div class="flags-header">Damage &amp; Wear Flags</div>
+        ${allFlags.length === 0
+          ? `<div class="no-flags"><span>✓</span> No damage or wear flags detected.</div>`
+          : allFlags.map(f => {
+              const compLabel = COMPONENT_LABELS[f.component] || f.component.replace(/_/g, ' ');
+              const conf = f.confidence != null ? ` · ${Math.round(f.confidence * 100)}%` : '';
+              return `<div class="flag-row">
+                <span class="flag-severity sev-${f.severity}">${f.severity}</span>
+                <div class="flag-detail">
+                  <div>${f.damage_type.replace(/_/g, ' ')}</div>
+                  <div class="flag-component">${compLabel}${conf}</div>
+                </div>
+              </div>`;
+            }).join('')
+        }
+      </div>`;
+
+    return metaHtml + scoreHtml + compHtml + flagsHtml;
+  }
+
+  // ── Job execution ─────────────────────────────────────────────────────────
+
+  async function runJob(job) {
     try {
-      // 1. Get presigned URL
-      const code_id = getCodeId();
-      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(file.name)}&code_id=${encodeURIComponent(code_id)}`);
+      // Presign
+      job.status = 'uploading';
+      renderJob(job);
+
+      const code_id   = getCodeId();
+      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(job.file.name)}&code_id=${encodeURIComponent(code_id)}`);
       if (!presignRes.ok) throw new Error('Failed to get upload URL');
       const { job_id, upload_url } = await presignRes.json();
-      $('job-id-label').textContent = `job: ${job_id}`;
+      job.job_id = job_id;
+      renderJob(job);
 
-      // 2. Upload to S3
+      // Upload
       const putRes = await fetch(upload_url, {
         method: 'PUT',
-        body: file,
+        body: job.file,
         headers: { 'Content-Type': 'video/mp4' },
       });
       if (!putRes.ok) throw new Error('Upload failed');
 
-      // 3. Cycle through stage labels while polling
-      let stageIdx = 0;
-      $('stage-label').textContent = STAGES[stageIdx];
-      stageTimer = setInterval(() => {
-        stageIdx = (stageIdx + 1) % STAGES.length;
-        $('stage-label').textContent = STAGES[stageIdx];
-      }, 8000);
+      // Poll
+      job.status = 'analyzing';
+      renderJob(job);
 
-      // 4. Poll for completion (max 5 min)
       const result = await pollJob(job_id, 300);
-
-      clearInterval(stageTimer);
-      clearInterval(elapsedTimer);
-
-      renderResult(result, job_id);
+      job.result   = result;
+      job.status   = 'complete';
+      job.expanded = true;
 
     } catch (err) {
-      clearInterval(elapsedTimer);
-      if (stageTimer) clearInterval(stageTimer);
-      renderError(err.message);
+      job.error  = err.message;
+      job.status = 'failed';
+      job.expanded = true;
     }
+
+    renderJob(job);
+    updateQueueSummary();
   }
 
   async function pollJob(job_id, timeoutSecs) {
@@ -759,31 +897,23 @@
       if (!res.ok) continue;
       const data = await res.json();
       if (data.status === 'complete') return data;
-      if (data.status === 'failed') throw new Error(data.error || 'Job failed');
+      if (data.status === 'failed')   throw new Error(data.error || 'Job failed');
     }
-    throw new Error('Timed out waiting for result. The worker may not be running.');
+    throw new Error('Timed out. Make sure the worker is running.');
   }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  // ── Result rendering ─────────────────────────────────────────────────────
+  function formatBytes(b) {
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+    return (b / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 
-  const COMPONENT_LABELS = {
-    roof_visible: 'Roof (visible)',
-    siding: 'Siding',
-    paint: 'Paint',
-    windows: 'Windows',
-    gutters: 'Gutters',
-    trim: 'Trim',
-    foundation_visible: 'Foundation',
-    landscaping: 'Landscaping',
-    driveway: 'Driveway',
-    walkway: 'Walkway',
-    fence: 'Fence',
-    hvac_visible: 'HVAC',
-    doors: 'Doors',
-    garage_door: 'Garage Door',
-  };
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
   function scoreColor(s) {
     if (s >= 80) return 'var(--green)';
@@ -799,111 +929,13 @@
     return 'Critical issues detected';
   }
 
-  function renderResult(data, job_id) {
-    showSection('result');
-    $('error-card').hidden = true;
-    $('score-content').hidden = false;
-
-    const result = data.result || {};
-    const score = result.top_line_score != null ? Math.round(result.top_line_score) : null;
-
-    // Score hero
-    if (score !== null) {
-      $('score-number').textContent = score;
-      $('score-number').style.color = scoreColor(score);
-      $('score-sub').textContent = scoreLabel(score);
-      const bar = $('score-bar');
-      bar.style.width = score + '%';
-      bar.style.background = scoreColor(score);
-    } else {
-      $('score-number').textContent = '—';
-      $('score-sub').textContent = 'Insufficient coverage — try a longer clip';
-    }
-
-    // Meta
-    const scored = result.scored_at ? new Date(result.scored_at).toLocaleString() : '';
-    const schema = result.schema_version || '';
-    $('meta-row').innerHTML = `<span>job: ${job_id}</span>${scored ? `<span>scored: ${scored}</span>` : ''}${schema ? `<span>schema: ${schema}</span>` : ''}`;
-
-    // Components
-    const comps = result.components || {};
-    const detected = Object.entries(comps)
-      .filter(([, v]) => v.detected)
-      .sort(([, a], [, b]) => (b.condition_score ?? -1) - (a.condition_score ?? -1));
-
-    const list = $('components-list');
-    if (detected.length === 0) {
-      list.innerHTML = '<div style="padding:1.25rem;color:var(--muted);font-size:0.875rem;">No components detected. Try a longer or closer clip.</div>';
-    } else {
-      list.innerHTML = detected.map(([key, v]) => {
-        const label = COMPONENT_LABELS[key] || key.replace(/_/g, ' ');
-        const mat = v.material ? `<div class="component-material">${v.material}</div>` : '';
-        let scoreHtml;
-        if (v.condition_score != null) {
-          const s = Math.round(v.condition_score);
-          const color = scoreColor(s);
-          scoreHtml = `
-            <div class="component-score-wrap">
-              <div class="component-bar">
-                <div class="component-bar-fill" style="width:${s}%;background:${color}"></div>
-              </div>
-              <div class="component-score-num" style="color:${color}">${s}</div>
-            </div>`;
-        } else {
-          scoreHtml = `<div class="no-coverage">low coverage</div>`;
-        }
-        return `<div class="component-row">
-          <div class="component-name">${label}${mat}</div>
-          ${scoreHtml}
-        </div>`;
-      }).join('');
-    }
-
-    // Damage flags
-    const allFlags = [];
-    for (const [comp, v] of Object.entries(comps)) {
-      for (const f of (v.damage_flags || [])) {
-        allFlags.push({ ...f, component: comp });
-      }
-    }
-
-    const sevOrder = { high: 0, medium: 1, low: 2 };
-    allFlags.sort((a, b) => (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3));
-
-    const flagsList = $('flags-list');
-    if (allFlags.length === 0) {
-      flagsList.innerHTML = '<div class="no-flags"><span>✓</span> No damage or wear flags detected.</div>';
-    } else {
-      flagsList.innerHTML = allFlags.map(f => {
-        const compLabel = COMPONENT_LABELS[f.component] || f.component.replace(/_/g, ' ');
-        const sevClass = `sev-${f.severity}`;
-        const conf = f.confidence != null ? ` · ${Math.round(f.confidence * 100)}% confidence` : '';
-        return `<div class="flag-row">
-          <span class="flag-severity ${sevClass}">${f.severity}</span>
-          <div class="flag-detail">
-            <div>${f.damage_type.replace(/_/g, ' ')}</div>
-            <div class="flag-component">${compLabel}${conf}</div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
-
-  function renderError(msg) {
-    showSection('result');
-    $('error-card').hidden = false;
-    $('error-msg').textContent = msg;
-    $('score-content').hidden = true;
-  }
-
-  $('reset-btn').addEventListener('click', () => {
-    selectedFile = null;
-    fileInput.value = '';
-    $('file-info').hidden = true;
-    $('run-btn').disabled = true;
-    $('run-btn').textContent = 'Select a clip to begin';
-    showSection('upload');
-  });
+  const COMPONENT_LABELS = {
+    roof_visible: 'Roof (visible)', siding: 'Siding', paint: 'Paint',
+    windows: 'Windows', gutters: 'Gutters', trim: 'Trim',
+    foundation: 'Foundation', landscaping: 'Landscaping',
+    driveway: 'Driveway', walkway: 'Walkway', fence: 'Fence',
+    hvac_visible: 'HVAC', doors: 'Doors', downspouts: 'Downspouts',
+  };
 </script>
 
 </body>
