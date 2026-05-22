@@ -852,14 +852,21 @@
 
   async function runJob(job) {
     try {
-      // Presign
+      // Presign — retry up to 4x to handle Lambda cold-start throttling
       job.status = 'uploading';
       renderJob(job);
 
-      const code_id   = getCodeId();
-      const presignRes = await fetch(`${API}/presign?filename=${encodeURIComponent(job.file.name)}&code_id=${encodeURIComponent(code_id)}`);
-      if (!presignRes.ok) throw new Error('Failed to get upload URL');
-      const { job_id, upload_url } = await presignRes.json();
+      const code_id = getCodeId();
+      let presignData = null;
+      for (let attempt = 0; attempt < 4; attempt++) {
+        if (attempt > 0) await sleep(attempt * 800);
+        try {
+          const res = await fetch(`${API}/presign?filename=${encodeURIComponent(job.file.name)}&code_id=${encodeURIComponent(code_id)}`);
+          if (res.ok) { presignData = await res.json(); break; }
+        } catch { /* network blip, retry */ }
+      }
+      if (!presignData) throw new Error('Failed to get upload URL after retries');
+      const { job_id, upload_url } = presignData;
       job.job_id = job_id;
       renderJob(job);
 
